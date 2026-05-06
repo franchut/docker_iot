@@ -7,4 +7,5 @@ services:
       - SERVIDOR=${SERVIDOR} #Se reemplazará por la env var SERVIDOR defineda en .env
       - TOPICO1=${TOPICO1}
       - TOPICO2=${TOPICO2}
+      - TOPICO3=${TOPICO3}
     restart: unless-stopped
