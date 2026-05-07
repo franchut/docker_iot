@@ -23,6 +23,9 @@ async def recibir_mensajes_top2(mensaje):
 
 async def consumir_mensajes(client):
 
+    await client.subscribe(os.environ['TOPICO1'])
+    await client.subscribe(os.environ['TOPICO2'])
+
     async for mensaje in client.messages:
 
         topico = str(mensaje.topic)
@@ -80,8 +83,6 @@ async def main():
             tls_context=tls_context,
         ) as client:
 
-            await client.subscribe(os.environ['TOPICO1'])
-            await client.subscribe(os.environ['TOPICO2'])
             tarea1 = asyncio.create_task(contador(cont), name="contador")
             tarea2 = asyncio.create_task(publicar_contador(client, cont), name="publicador")
             tarea3 = asyncio.create_task(consumir_mensajes(client), name="consumidor")
