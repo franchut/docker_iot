@@ -50,13 +50,14 @@ async def publicar_contador(client, n):
         try:
 
             await client.publish(os.environ["TOPICO3"],
-                            n.valor, 
+                            str(n.valor), 
                             qos=aiomqtt.QoS.AT_LEAST_ONCE)
 
             await asyncio.sleep(5)
-        except:
 
-            pass
+        except Exception as e:
+
+            logging.error(e)
 
 
 async def main():
