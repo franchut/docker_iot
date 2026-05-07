@@ -49,7 +49,7 @@ async def publicar_contador(client, n):
 
         try:
 
-            await client.publish(os.environ["TOPICO3"],
+            await client.publish(os.environ['TOPICO3'],
                             str(n.valor), 
                             qos=aiomqtt.QoS.AT_LEAST_ONCE)
 
