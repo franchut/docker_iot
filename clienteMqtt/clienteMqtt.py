@@ -42,6 +42,8 @@ async def contador(n):
 
         n.valor += 1
         await asyncio.sleep(3)
+        logging.info(f"Estado del contador {str(n.valor)}")
+
 
 async def publicar_contador(client, n):
 
@@ -51,9 +53,10 @@ async def publicar_contador(client, n):
 
             await client.publish(os.environ['TOPICO3'],
                             str(n.valor), 
-                            qos=aiomqtt.QoS.AT_LEAST_ONCE)
+                            qos=1)
 
             await asyncio.sleep(5)
+            logging.info(f"Topico : {os.environ['TOPICO3']}")
 
         except Exception as e:
 
