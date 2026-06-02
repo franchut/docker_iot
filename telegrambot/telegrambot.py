@@ -56,43 +56,6 @@ async def desactivar_rele(update: Update, context):
 async def destello(update: Update, context):
     await context.bot.send_message(update.message.chat.id, text="Funciona")
 
-async def graficos(update: Update, context):
-    logging.info(update.message.text)
-    sql = f"""SELECT timestamp, {update.message.text.split()[1]}
-            FROM (
-                SELECT timestamp, {update.message.text.split()[1]},
-                    ROW_NUMBER() OVER (ORDER BY id) AS rn
-                FROM mediciones
-                WHERE timestamp >= NOW() - INTERVAL 1 DAY
-                AND sensor_id LIKE 'sensor_1'
-            ) AS t
-            WHERE rn % 2 = 0
-            ORDER BY timestamp;"""
-    conn = await aiomysql.connect(host=os.environ["MARIADB_SERVER"], port=3306,
-                                    user=os.environ["MARIADB_USER"],
-                                    password=os.environ["MARIADB_USER_PASS"],
-                                    db=os.environ["MARIADB_DB"])
-    async with conn.cursor() as cur:
-        await cur.execute(sql)
-        filas = await cur.fetchall()
-
-        fig, ax = plt.subplots(figsize=(7, 4))
-        fecha,var=zip(*filas)
-        ax.plot(fecha,var)
-        ax.grid(True, which='both')
-        ax.set_title(update.message.text, fontsize=14, verticalalignment='bottom')
-        ax.set_xlabel('fecha')
-        ax.set_ylabel('unidad')
-
-        buffer = BytesIO()
-        fig.tight_layout()
-        fig.savefig(buffer, format='png')
-        plt.close()
-        buffer.seek(0)
-        await context.bot.send_photo(chat_id=update.effective_chat.id, photo=buffer)
-        buffer.close()
-    conn.close()
-
 def main():
     application = Application.builder().token(token).build()
     application.add_handler(CommandHandler('start', start))
@@ -105,7 +68,6 @@ def main():
     application.add_handler(MessageHandler(filters.Regex(re.compile("^(activar rele)$",re.IGNORECASE)), activar_rele))
     application.add_handler(MessageHandler(filters.Regex(re.compile("^(desactivar rele)$",re.IGNORECASE)), desactivar_rele))
     application.add_handler(MessageHandler(filters.Regex(re.compile("^(destello)$",re.IGNORECASE)), destello))
-    application.add_handler(MessageHandler(filters.Regex(re.compile("^(gráfico temperatura|gráfico humedad)$",re.IGNORECASE)), graficos))
     application.run_polling()
 
 if __name__ == '__main__':
