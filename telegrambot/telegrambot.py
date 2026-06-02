@@ -3,6 +3,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 import logging, os, asyncio, aiomysql, traceback, locale
 import matplotlib.pyplot as plt
 from io import BytesIO
+import re
 
 token=os.environ["TB_TOKEN"]
 
@@ -33,26 +34,27 @@ async def kill(update: Update, context):
         await context.bot.send_message(update.message.chat.id, text="¡¡¡Ahora estan todos muertos!!!")
     else:
         await context.bot.send_message(update.message.chat.id, text="☠️ ¡¡¡Esto es muy peligroso!!! ☠️")
-        
-async def medicion(update: Update, context):
-    logging.info(update.message.text)
-    sql = f"SELECT timestamp, {update.message.text} FROM mediciones ORDER BY timestamp DESC LIMIT 1"
-    conn = await aiomysql.connect(host=os.environ["MARIADB_SERVER"], port=3306,
-                                    user=os.environ["MARIADB_USER"],
-                                    password=os.environ["MARIADB_USER_PASS"],
-                                    db=os.environ["MARIADB_DB"])
-    async with conn.cursor() as cur:
-        await cur.execute(sql)
-        r = await cur.fetchone()
-        if update.message.text == 'temperatura':
-            unidad = 'ºC'
-        else:
-            unidad = '%'
-        await context.bot.send_message(update.message.chat.id,
-                                    text="La última {} es de {} {},\nregistrada a las {:%H:%M:%S %d/%m/%Y}"
-                                    .format(update.message.text, str(r[1]).replace('.',','), unidad, r[0]))
-        logging.info("La última {} es de {} {}, medida a las {:%H:%M:%S %d/%m/%Y}".format(update.message.text, r[1], unidad, r[0]))
-    conn.close()
+
+async def temperatura(update: Update, context):
+    await context.bot.send_message(update.message.chat.id, text="Funciona")
+
+async def humedad(update: Update, context):
+    await context.bot.send_message(update.message.chat.id, text="Funciona")
+
+async def automatico(update: Update, context):
+    await context.bot.send_message(update.message.chat.id, text="Funciona")
+
+async def manual(update: Update, context):
+    await context.bot.send_message(update.message.chat.id, text="Funciona")
+
+async def activar_rele(update: Update, context):
+    await context.bot.send_message(update.message.chat.id, text="Funciona")
+
+async def desactivar_rele(update: Update, context):
+    await context.bot.send_message(update.message.chat.id, text="Funciona")
+
+async def destello(update: Update, context):
+    await context.bot.send_message(update.message.chat.id, text="Funciona")
 
 async def graficos(update: Update, context):
     logging.info(update.message.text)
@@ -96,8 +98,14 @@ def main():
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('about', about))
     application.add_handler(CommandHandler('kill', kill))
-    application.add_handler(MessageHandler(filters.Regex("^(temperatura|humedad)$"), medicion))
-    application.add_handler(MessageHandler(filters.Regex("^(gráfico temperatura|gráfico humedad)$"), graficos))
+    application.add_handler(MessageHandler(filters.Regex(re.compile("^(temperatura)$",re.IGNORECASE)), temperatura))
+    application.add_handler(MessageHandler(filters.Regex(re.compile("^(humedad)$",re.IGNORECASE)), humedad))
+    application.add_handler(MessageHandler(filters.Regex(re.compile("^(modo automatico)$",re.IGNORECASE)), automatico))
+    application.add_handler(MessageHandler(filters.Regex(re.compile("^(modo manual)$",re.IGNORECASE)), manual))
+    application.add_handler(MessageHandler(filters.Regex(re.compile("^(activar rele)$",re.IGNORECASE)), activar_rele))
+    application.add_handler(MessageHandler(filters.Regex(re.compile("^(desactivar rele)$",re.IGNORECASE)), desactivar_rele))
+    application.add_handler(MessageHandler(filters.Regex(re.compile("^(destello)$",re.IGNORECASE)), destello))
+    application.add_handler(MessageHandler(filters.Regex(re.compile("^(gráfico temperatura|gráfico humedad)$",re.IGNORECASE)), graficos))
     application.run_polling()
 
 if __name__ == '__main__':
