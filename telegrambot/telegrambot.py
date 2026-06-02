@@ -19,10 +19,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         apellido=update.message.from_user.last_name
     else:
         apellido=""
-    kb = [["temperatura"],["humedad"],["gráfico temperatura"],["gráfico humedad"]]
+    kb = [["Temperatura"],["Humedad"],["Modo automatico"],["Modo manual"],["Activar Rele"],["Desactivar rele"],["Destello"]]
     await context.bot.send_message(update.message.chat.id, text="Bienvenido al Bot "+ nombre + " " + apellido,reply_markup=ReplyKeyboardMarkup(kb))
 
-async def acercade(update: Update, context):
+async def about(update: Update, context):
     await context.bot.send_message(update.message.chat.id, text="Este bot fue creado para el curso de IoT FIO")
 
 async def kill(update: Update, context):
@@ -94,7 +94,7 @@ async def graficos(update: Update, context):
 def main():
     application = Application.builder().token(token).build()
     application.add_handler(CommandHandler('start', start))
-    application.add_handler(CommandHandler('acercade', acercade))
+    application.add_handler(CommandHandler('about', about))
     application.add_handler(CommandHandler('kill', kill))
     application.add_handler(MessageHandler(filters.Regex("^(temperatura|humedad)$"), medicion))
     application.add_handler(MessageHandler(filters.Regex("^(gráfico temperatura|gráfico humedad)$"), graficos))
