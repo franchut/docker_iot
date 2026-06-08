@@ -117,6 +117,7 @@ services:
       - MQTT_USR=${MQTT_USR}
       - MQTT_PASS=${MQTT_PASS}
       - PUERTO_MQTTS=${PUERTO_MQTTS}
+      - ID_PICO=${ID_PICO}
     restart: unless-stopped
     depends_on:
       - mariadb
