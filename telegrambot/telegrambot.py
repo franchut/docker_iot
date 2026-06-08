@@ -6,16 +6,61 @@ from io import BytesIO
 import re
 import ssl
 import aiomqtt
-from clienteMqtt import ClienteMqtt
 
 class ClienteMqtt:
+
     def __init__(self):
+
         self.clientemqtt = None
+
+    async def publicar(self, topico, mensaje):
+
+        logging.info(f"Publicando en {topico}")
+
+        await self.clientemqtt.publish(
+            topico,
+            mensaje,
+            qos=1
+        )
+
+        logging.info(f"Publicado en {topico}: {mensaje}")
 
 token=os.environ["TB_TOKEN"]
 
 logging.basicConfig(format='%(asctime)s - TelegramBot - %(levelname)s - %(message)s', level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
+
+async def conectar_mqtt():
+
+    logging.info(f"Loop MQTT: {id(asyncio.get_running_loop())}")
+
+    try:
+
+        tls_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        tls_context.verify_mode = ssl.CERT_REQUIRED
+        tls_context.check_hostname = True
+        tls_context.load_default_certs()
+
+        client = aiomqtt.Client(
+            os.environ["SERVIDOR"],
+            username=os.environ["MQTT_USR"],
+            password=os.environ["MQTT_PASS"],
+            port=int(os.environ["PUERTO_MQTTS"]),
+            tls_context=tls_context
+        )
+
+        logging.info("Antes de __aenter__")
+
+        await client.__aenter__()
+
+        logging.info("Después de __aenter__")
+
+        return client
+
+    except Exception as e:
+
+        logging.exception(e)
+        raise
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info("se conectó: " + str(update.message.from_user.id))
@@ -44,12 +89,24 @@ async def kill(update: Update, context):
 
 async def temperatura(update: Update, context):
 
-    mqtt = context.application.bot_data["mqtt"]
+    tls_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    tls_context.verify_mode = ssl.CERT_REQUIRED
+    tls_context.check_hostname = True
+    tls_context.load_default_certs()
 
-    await mqtt.publicar(
-        "iot/temperatura",
-        "consulta"
-    )
+    async with aiomqtt.Client(
+        os.environ["SERVIDOR"],
+        username=os.environ["MQTT_USR"],
+        password=os.environ["MQTT_PASS"],
+        port=int(os.environ["PUERTO_MQTTS"]),
+        tls_context=tls_context
+    ) as client:
+
+        await client.publish(
+            "iot/temperatura",
+            "consulta",
+            qos=1
+        )
 
     await context.bot.send_message(
         update.message.chat.id,
@@ -74,11 +131,15 @@ async def desactivar_rele(update: Update, context):
 async def destello(update: Update, context):
     await context.bot.send_message(update.message.chat.id, text="Funciona")
 
+
 def main():
-    conexion = ClienteMqtt()
-    conexion.clientemqtt = asyncio.run(conectar_mqtt())
-    application = Application.builder().token(token).build()
-    application.bot_data["mqtt"] = conexion
+
+    application = (
+        Application.builder()
+        .token(token)
+        .build()
+    )
+
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('about', about))
     application.add_handler(CommandHandler('kill', kill))
