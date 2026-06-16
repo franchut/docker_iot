@@ -10,3 +10,10 @@ if(btnDelete) {
     });
   })
 }
+
+document.querySelectorAll('.tema').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.documentElement.setAttribute('data-bs-theme', this.dataset.theme);
+  });
+});
