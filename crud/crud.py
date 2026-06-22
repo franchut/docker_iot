@@ -145,3 +145,11 @@ def logout():
     session.clear()
     logging.info("el usuario {} cerró su sesión".format(session.get("user_id")))
     return redirect(url_for('index'))
+
+@app.route("/tema/<modo>")
+@require_login
+def cambiar_tema(modo):
+    if modo in ["light", "dark"]:
+        session["tema"] = modo
+
+    return redirect(request.referrer or url_for("index"))

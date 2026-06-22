@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="{{ session.get('tema', 'light') }}">
 
 <head>
   <meta charset="UTF-8" />
   <title>FLASK CRUD 1.6</title>
   <!-- <link rel="stylesheet" href="https://bootswatch.com/5/cosmo/bootstrap.min.css"> -->
-  <link rel="stylesheet" href="https://bootswatch.com/5/superhero/bootstrap.min.css">
+  <link rel="stylesheet" href="https://bootswatch.com/5/pulse/bootstrap.min.css">
   {% with messages = get_flashed_messages() %} {% if messages %}
   {% for message in messages %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -23,8 +23,12 @@
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true"
           aria-expanded="false">Tema</a>
         <div class="dropdown-menu">
-          <a class="dropdown-item tema" data-bs-theme="dark">Oscuro</a>
-          <a class="dropdown-item tema" data-bs-theme="light">Claro</a>
+          <a class="dropdown-item" href="{{ url_for('cambiar_tema', modo='dark') }}">
+            Oscuro
+          </a>
+          <a class="dropdown-item" href="{{ url_for('cambiar_tema', modo='light') }}">
+            Claro
+          </a>
         </div>
       </li>
       <div class="d-flex">
