@@ -8,7 +8,7 @@ async def main():
     tls_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     tls_context.verify_mode = ssl.CERT_REQUIRED
     tls_context.check_hostname = True
-    tls_context.load_default_certs()
+    tls_context.load_verify_locations(certifi.where())
 
     async with aiomqtt.Client(
         os.environ["SERVIDOR"],

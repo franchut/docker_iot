@@ -1,56 +1,118 @@
 {% extends "layout.html" %}
+
 {% block body %}
+
 <div class="row">
-  <div class="col-md-7 mx-auto">
-    <div class="card card-body">
-      <form action="{{url_for('add_contact')}}" method="POST">
-        <legend>Cargar contacto</legend>
-        <div class="form-group">
-          <label class="col-form-label mt-4" for="inputDefault">Nombre completo</label>
-          <input type="text" class="form-control" id="inputDefault" data-ddg-inputtype="unknown" name="nombre">
+
+  <div class="col-lg-8 mx-auto">
+
+    <div class="card">
+
+      <div class="card-header">
+        <h3>Panel de Control IoT</h3>
+      </div>
+
+      <div class="card-body">
+
+        <div class="alert alert-secondary mb-4">
+        
+          <h5>Estado actual de la Pico</h5>
+        
+          <p><strong>Temperatura:</strong> {{ estado[0] }} °C</p>
+        
+          <p><strong>Humedad:</strong> {{ estado[1] }} %</p>
+        
+          <p><strong>Setpoint:</strong> {{ estado[2] }}</p>
+        
+          <p><strong>Período:</strong> {{ estado[3] }} s</p>
+        
+          <p><strong>Modo:</strong> {{ estado[4] }}</p>
+        
+          <p><strong>Relé:</strong>
+            {% if estado[5] == "1" %}
+            Encendido
+            {% else %}
+            Apagado
+            {% endif %}
+          </p>
+        
         </div>
-        <div class="form-group">
-          <label class="col-form-label mt-4" for="tel">Teléfono</label>
-          <input type="tel" class="form-control" id="tel" data-ddg-inputtype="unknown" name="tel">
+        <h5>Acciones rápidas</h5>
+
+        <div class="d-flex gap-2 mb-4">
+
+          <a href="{{ url_for('destello') }}" class="btn btn-warning">
+            Destello LED
+          </a>
+
+          <a href="{{ url_for('rele_on') }}" class="btn btn-success">
+            Relé ON
+          </a>
+
+          <a href="{{ url_for('rele_off') }}" class="btn btn-danger">
+            Relé OFF
+          </a>
+
         </div>
-        <div class="form-group">
-          <label for="email" class="form-label mt-4">Email</label>
-          <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp"
-            data-ddg-inputtype="identities.emailAddress" data-ddg-autofill="true">
-          <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+
+        <hr>
+
+        <h5>Configurar Período</h5>
+
+        <form action="{{ url_for('periodo') }}" method="POST">
+
+          <div class="input-group mb-3">
+
+            <input type="number" class="form-control" name="periodo" placeholder="Período en segundos">
+
+            <button class="btn btn-primary" type="submit">
+              Enviar
+            </button>
+
+          </div>
+
+        </form>
+
+        <hr>
+
+        <h5>Configurar Setpoint</h5>
+
+        <form action="{{ url_for('setpoint') }}" method="POST">
+
+          <div class="input-group mb-3">
+
+            <input type="number" class="form-control" name="setpoint" placeholder="Nuevo setpoint">
+
+            <button class="btn btn-primary" type="submit">
+              Enviar
+            </button>
+
+          </div>
+
+        </form>
+
+        <hr>
+
+        <h5>Modo de funcionamiento</h5>
+
+        <div class="d-flex gap-2">
+
+          <a href="{{ url_for('modo_auto') }}" class="btn btn-info">
+            Automático
+          </a>
+
+          <a href="{{ url_for('modo_manual') }}" class="btn btn-secondary">
+            Manual
+          </a>
+
         </div>
-        <button type="submit" class="btn btn-primary mt-4">guardar</button>
-      </form>
+
+      </div>
+
     </div>
+
   </div>
+
 </div>
-<div class="row pt-5 ">
-  <div class="col-md-7 mx-auto">
-    <table class="table table-hover table-default">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Nombre completo</th>
-          <th scope="col">Teléfono</th>
-          <th scope="col">Email</th>
-          <th scope="col">acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for contacto in contactos %}
-        <tr>
-          <td>{{contacto.0}}</td>
-          <td>{{contacto.1}}</td>
-          <td>{{contacto.2}}</td>
-          <td>{{contacto.3}}</td>
-          <td>
-            <a href="{{url_for('conseguir_contacto',id=contacto.0)}}" class="btn btn-secondary">editar</a>
-            <a href="{{url_for('borrar_contacto',id=contacto.0)}}" class="btn btn-danger btn-borrar">borrar</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
+
 {% endblock %}
