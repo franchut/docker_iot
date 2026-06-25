@@ -24,6 +24,8 @@ services:
     depends_on:
       - mariadb
   clientemqtt:
+    build:
+      context: ./clienteMqtt
     image: clientemqtt
     container_name: clientemqtt
     environment:
